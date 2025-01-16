@@ -13,7 +13,7 @@
             text-align: center;
             background-color: #000;
             color: #fff;
-            margin: 50;
+            margin: 50px;
             padding: 0;
         }
 
@@ -33,9 +33,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 1px solid #000000;
+            border: 1px solid #000;
             border-radius: 12px;
-            background-color: #333030;
+            background-color: #333;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
             width: 80%;
@@ -78,7 +78,7 @@
         }
 
         .task-button {
-            background-color: #ffffff;
+            background-color: #fff;
             color: rgb(0, 0, 0);
             border: none;
             padding: 10px 20px;
@@ -113,7 +113,7 @@
     <br><br>
     <div id="balance-container">
         <h2 id="user-name"><b>مرحبًا!</b></h2>
-        <span id="balance">0</span>♘ total points
+        <span id="balance">0</span> ♘ total points
     </div>
     <br>
     <div class="task-container">
@@ -160,65 +160,52 @@
             <span>BALANCE</span>
         </a>
     </nav>
+
+    <!-- كود JavaScript -->
     <script>
-        // Telegram WebApp Initialization
-        const tg = window.Telegram.WebApp;
-        tg.ready();
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.Telegram && Telegram.WebApp) {
+                const tg = Telegram.WebApp;
+                tg.ready();
 
-        // Get User Data
-        const user = tg.initDataUnsafe?.user;
+                // الحصول على بيانات المستخدم من Telegram WebApp
+                const user = tg.initDataUnsafe?.user;
 
-        if (user) {
-            const userData = {
-                username: user.username || user.first_name || 'Unknown',
-                userId: user.id,
-            };
+                if (user) {
+                    // إرسال بيانات المستخدم إلى السيرفر
+                    fetch('https://newlast-git-main-tamers-projects-b13511eb.vercel.app/get-user-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ user_id: user.id }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error:', data.error);
+                            document.getElementById('user-name').innerText = 'مرحبًا، ضيف!';
+                            document.getElementById('balance').innerText = 0;
+                        } else {
+                            const userName = data.first_name || data.username || 'Unknown User';
+                            const userPoints = data.points || 0;
 
-            // إرسال البيانات إلى الخادم
-            fetch('https://newlast-9anbbbl6u-tamers-projects-b13511eb.vercel.app', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log('User data sent:', data);
-                })
-                .catch((error) => {
-                    console.error('Error sending user data:', error);
-                });
-        } else {
-            console.warn('User data is unavailable.');
-        }
+                            document.getElementById('user-name').innerText = `مرحبًا، ${userName}!`;
+                            document.getElementById('balance').innerText = userPoints;
+                        }
+                    })
+                    .catch(error => console.error('Fetch Error:', error));
+                }
+            } else {
+                console.warn("⚠️ Telegram WebApp غير متوفر، تأكد من تشغيل الصفحة داخل Telegram.");
+            }
+        });
 
-        // Initialize user points from Local Storage
-        let userId = user?.id || 'guest';
-        let userPoints = localStorage.getItem(`points_${userId}`) || 0;
-
-        // Add 5 points for new visits (if not visited before)
-        if (!localStorage.getItem(`visited_${userId}`)) {
-            userPoints = parseInt(userPoints) + 5; // Add 5 points
-            localStorage.setItem(`points_${userId}`, userPoints); // Save updated points
-            localStorage.setItem(`visited_${userId}`, true); // Mark as visited
-        }
-
-        // Update HTML with user data
-        document.getElementById('user-name').innerText = user
-            ? `مرحبًا، ${user.first_name || user.username}!`
-            : 'مرحبًا، ضيف!';
-        document.getElementById('balance').innerText = userPoints;
-
-        // Function to add points and navigate to users page
+        // دالة لإضافة النقاط والانتقال إلى صفحة اللعبة
         function addUserPointsAndNavigate() {
-            // Update the points in localStorage
-            localStorage.setItem(`points_${userId}`, userPoints);
-
-            // Navigate to the users page (leaderboard)
-            window.location.href = 'leaderboard.html';
+            alert("تمت إضافة النقاط! سيتم توجيهك إلى اللعبة.");
+            window.location.href = "game.html";
         }
     </script>
 </body>
-
 </html>
