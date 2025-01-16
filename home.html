@@ -1,23 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحة البداية</title>
-
-    <!-- تضمين favicon -->
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    
+    <title>Complete Tasks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="material/css/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 50px;
+            background-color: #000;
+            color: #fff;
+            margin: 50;
+            padding: 0;
+        }
+
+        #balance-container {
+            margin: 20px;
+            font-size: 18px;
+        }
+
+        .task-container {
+            margin: 10px auto;
+            max-width: 600px;
+        }
+
+        .task {
+            margin: 10px auto;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #000000;
+            border-radius: 12px;
+            background-color: #333030;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            width: 80%;
+        }
+
+        .task:hover {
+            transform: translateY(-5px);
+        }
+
+        .task-detail {
+            display: flex;
+            align-items: center;
+        }
+
+        .task-image img {
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .task h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #f2f2f2;
+        }
+
+        .task-data {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .task-data img {
+            margin-right: 5px;
+        }
+
+        .task-data h5 {
+            margin: 0;
+            color: #ffcc00;
+            font-size: 18px;
+        }
+
+        .task-button {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .task-button:hover {
+            background-color: #a2aaa0;
+        }
+
+        @media (max-width: 600px) {
+            .task-container {
+                max-width: 100%;
+            }
+
+            .task-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .task h4 {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <h1>مرحبًا بك في تطبيقنا!</h1>
-    <p>هذه هي الصفحة الرئيسية.</p>
+    <br><br>
+    <div id="balance-container">
+        <h2 id="user-name"><b>مرحبًا!</b></h2>
+        <span id="balance">0</span>♘ total points
+    </div>
+    <br>
+    <div class="task-container">
+        <div class="task">
+            <div class="task-detail">
+                <div class="task-image">
+                    <img src="material/images/logo.png" width="45px" alt="">
+                </div>
+                <div>
+                    <h4>play now</h4>
+                    <div class="task-data">
+                        <img src="material/images/logo.png" width="20px" alt="Coin Icon">
+                        <h5>300</h5>
+                    </div>
+                </div>
+            </div>
+            <button class="task-button" onclick="addUserPointsAndNavigate()">♘ play now</button>
+        </div>
+    </div>
+    <div class="coin-container">
+        <div class="task-image">
+            <img src="material/images/logo.png" width="80%">
+        </div>
+    </div>
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>HOME</span>
+        </a>
+        <a href="leaderboard.html" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            <span>LEADERBOARD</span>
+        </a>
+        <a href="invite-friends.html" class="nav-item">
+            <i class="fas fa-user-friends"></i>
+            <span>FRIENDS</span>
+        </a>
+        <a href="task.html" class="nav-item">
+            <i class="fas fa-tasks"></i>
+            <span>TASKS</span>
+        </a>
+        <a href="balance.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>BALANCE</span>
+        </a>
+    </nav>
+    <script>
+        // Telegram WebApp Initialization
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        // Get User Data
+        const user = tg.initDataUnsafe?.user;
+
+        if (user) {
+            const userData = {
+                username: user.username || user.first_name || 'Unknown',
+                userId: user.id,
+            };
+
+            // إرسال البيانات إلى الخادم
+            fetch('http://127.0.0.1:5000/save-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log('User data sent:', data);
+                })
+                .catch((error) => {
+                    console.error('Error sending user data:', error);
+                });
+        } else {
+            console.warn('User data is unavailable.');
+        }
+
+        // Initialize user points from Local Storage
+        let userId = user?.id || 'guest';
+        let userPoints = localStorage.getItem(points_${userId}) || 0;
+
+        // Add 5 points for new visits (if not visited before)
+        if (!localStorage.getItem(visited_${userId})) {
+            userPoints = parseInt(userPoints) + 5; // Add 5 points
+            localStorage.setItem(points_${userId}, userPoints); // Save updated points
+            localStorage.setItem(visited_${userId}, true); // Mark as visited
+        }
+
+        // Update HTML with user data
+        document.getElementById('user-name').innerText = user
+            ? مرحبًا، ${user.first_name || user.username}!
+            : 'مرحبًا، ضيف!';
+        document.getElementById('balance').innerText = userPoints;
+
+        // Function to add points and navigate to users page
+        function addUserPointsAndNavigate() {
+            // Update the points in localStorage
+            localStorage.setItem(points_${userId}, userPoints);
+
+            // Navigate to the users page (leaderboard)
+            window.location.href = 'leaderboard.html';
+        }
+    </script>
 </body>
+
 </html>
