@@ -6,7 +6,7 @@
     <title>موقع الشطرنج</title>
 </head>
 <body>
-    <h1>مرحبًا بك في موقع Flask!</h1>
+    <h1>مرحبًا بك في موقع الشطرنج!</h1>
     <p>تم تحميل هذا المحتوى من ملف HTML داخل تطبيق Flask الخاص بك.</p>
 
     <h2>معلومات المستخدم:</h2>
@@ -31,10 +31,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('User saved:', data);
                 if (data.user_id) {
-                    // إعادة تحميل الصفحة مع تمرير user_id في الرابط لجلب البيانات من الخادم
-                    window.location.href = `/?user_id=${data.user_id}`;
+                    document.getElementById('user-id').innerText = data.user_id;
+                    document.getElementById('username').innerText = data.username;
+                    document.getElementById('points').innerText = data.points;
                 }
             })
             .catch(error => console.error('Error:', error));
