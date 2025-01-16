@@ -10,28 +10,35 @@
     <p>تم تحميل هذا المحتوى من ملف HTML داخل تطبيق Flask الخاص بك.</p>
 
     <h2>معلومات المستخدم:</h2>
-    <p><strong>معرف المستخدم:</strong> {{ user_id }}</p>
-    <p><strong>اسم المستخدم:</strong> {{ username }}</p>
+    <p><strong>معرف المستخدم:</strong> <span id="user-id">{{ user_id }}</span></p>
+    <p><strong>اسم المستخدم:</strong> <span id="username">{{ username }}</span></p>
+    <p><strong>عدد النقاط:</strong> <span id="points">{{ points }}</span></p>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
 
-    const user = tg.initDataUnsafe?.user;
+        const user = tg.initDataUnsafe?.user;
 
-    if (user) {
-        fetch('http://127.0.0.1:5000/save-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: user.id,
-                username: user.username || user.first_name || 'Unknown'
+        if (user) {
+            const userId = user.id;
+            const username = user.username || user.first_name || 'Unknown';
+
+            fetch('http://127.0.0.1:5000/save-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId, username: username })
             })
-        })
-        .then(response => response.json())
-        .then(data => console.log('User saved:', data))
-        .catch(error => console.error('Error:', error));
-    }
-</script>
+            .then(response => response.json())
+            .then(data => {
+                console.log('User saved:', data);
+                if (data.user_id) {
+                    // إعادة تحميل الصفحة مع تمرير user_id في الرابط لجلب البيانات من الخادم
+                    window.location.href = `/?user_id=${data.user_id}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 </body>
 </html>
