@@ -195,25 +195,25 @@
 
         // Initialize user points from Local Storage
         let userId = user?.id || 'guest';
-        let userPoints = localStorage.getItem(points_${userId}) || 0;
+        let userPoints = localStorage.getItem(`points_${userId}`) || 0;
 
         // Add 5 points for new visits (if not visited before)
-        if (!localStorage.getItem(visited_${userId})) {
+        if (!localStorage.getItem(`visited_${userId}`)) {
             userPoints = parseInt(userPoints) + 5; // Add 5 points
-            localStorage.setItem(points_${userId}, userPoints); // Save updated points
-            localStorage.setItem(visited_${userId}, true); // Mark as visited
+            localStorage.setItem(`points_${userId}`, userPoints); // Save updated points
+            localStorage.setItem(`visited_${userId}`, true); // Mark as visited
         }
 
         // Update HTML with user data
         document.getElementById('user-name').innerText = user
-            ? مرحبًا، ${user.first_name || user.username}!
+            ? `مرحبًا، ${user.first_name || user.username}!`
             : 'مرحبًا، ضيف!';
         document.getElementById('balance').innerText = userPoints;
 
         // Function to add points and navigate to users page
         function addUserPointsAndNavigate() {
             // Update the points in localStorage
-            localStorage.setItem(points_${userId}, userPoints);
+            localStorage.setItem(`points_${userId}`, userPoints);
 
             // Navigate to the users page (leaderboard)
             window.location.href = 'leaderboard.html';
