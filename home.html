@@ -123,14 +123,14 @@
                     <img src="material/images/logo.png" width="45px" alt="">
                 </div>
                 <div>
-                    <h4>play now</h4>
+                    <h4>العب الآن</h4>
                     <div class="task-data">
                         <img src="material/images/logo.png" width="20px" alt="Coin Icon">
                         <h5>300</h5>
                     </div>
                 </div>
             </div>
-            <button class="task-button" onclick="addUserPointsAndNavigate()">♘ play now</button>
+            <button class="task-button" onclick="addUserPointsAndNavigate()">♘ العب الآن</button>
         </div>
     </div>
     <div class="coin-container">
@@ -141,27 +141,26 @@
     <nav class="bottom-nav">
         <a href="home.html" class="nav-item">
             <i class="fas fa-home"></i>
-            <span>HOME</span>
+            <span>الرئيسية</span>
         </a>
         <a href="leaderboard.html" class="nav-item">
             <i class="fas fa-trophy"></i>
-            <span>LEADERBOARD</span>
+            <span>لوحة الشرف</span>
         </a>
         <a href="invite-friends.html" class="nav-item">
             <i class="fas fa-user-friends"></i>
-            <span>FRIENDS</span>
+            <span>الأصدقاء</span>
         </a>
         <a href="task.html" class="nav-item">
             <i class="fas fa-tasks"></i>
-            <span>TASKS</span>
+            <span>المهام</span>
         </a>
         <a href="balance.html" class="nav-item">
             <i class="fas fa-wallet"></i>
-            <span>BALANCE</span>
+            <span>الرصيد</span>
         </a>
     </nav>
 
-    <!-- كود JavaScript -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             if (window.Telegram && Telegram.WebApp) {
@@ -183,12 +182,13 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
-                            console.error('Error:', data.error);
+                            console.error('حدث خطأ:', data.error);
                             document.getElementById('user-name').innerText = 'مرحبًا، ضيف!';
                             document.getElementById('balance').innerText = 0;
                         } else {
-                            const userName = data.first_name || data.username || 'Unknown User';
+                            const userName = data.first_name || data.username || 'مستخدم غير معروف';
                             const userPoints = data.points || 0;
+                            console.log('User Points:', userPoints);  // عرض بيانات النقاط في الكونسول
 
                             document.getElementById('user-name').innerText = `مرحبًا، ${userName}!`;
                             document.getElementById('balance').innerText = userPoints;
