@@ -161,51 +161,74 @@
         </a>
     </nav>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js"></script>
+
     <script>
+        // إعداد Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgwzqb8KWYCjMXlkTRJbhIZnWLIz_BVF0",
+            authDomain: "lastnewapp.firebaseapp.com",
+            projectId: "lastnewapp",
+            storageBucket: "lastnewapp.firebasestorage.app",
+            messagingSenderId: "793438014459",
+            appId: "1:793438014459:web:5969fe74a895f9f2dd195e",
+            measurementId: "G-X1WCJV12KZ"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         document.addEventListener("DOMContentLoaded", function () {
             if (window.Telegram && Telegram.WebApp) {
                 const tg = Telegram.WebApp;
                 tg.ready();
 
-                // الحصول على بيانات المستخدم من Telegram WebApp
                 const user = tg.initDataUnsafe?.user;
 
                 if (user) {
-                    // إرسال بيانات المستخدم إلى السيرفر
-                    fetch('https://newlast-r1pt4e9bs-tamers-projects-b13511eb.vercel.app/get-user-data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ user_id: user.id }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            console.error('حدث خطأ:', data.error);
-                            document.getElementById('user-name').innerText = 'مرحبًا، ضيف!';
-                            document.getElementById('balance').innerText = 0;
-                        } else {
-                            const userName = data.first_name || data.username || 'مستخدم غير معروف';
-                            const userPoints = data.points || 0;
-                            console.log('User Points:', userPoints);  // عرض بيانات النقاط في الكونسول
+                    const userRef = db.collection("users").doc(user.id);
 
-                            document.getElementById('user-name').innerText = `مرحبًا، ${userName}!`;
-                            document.getElementById('balance').innerText = userPoints;
+                    userRef.get().then(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            document.getElementById('user-name').innerText = `مرحبًا، ${data.username || 'مستخدم'}!`;
+                            document.getElementById('balance').innerText = data.points || 0;
+                        } else {
+                            userRef.set({
+                                username: user.first_name || user.username || "مستخدم جديد",
+                                points: 0
+                            }).then(() => {
+                                document.getElementById('user-name').innerText = `مرحبًا، ${user.first_name}!`;
+                                document.getElementById('balance').innerText = 0;
+                            });
                         }
-                    })
-                    .catch(error => console.error('Fetch Error:', error));
+                    }).catch(error => console.error("Firestore Error:", error));
                 }
             } else {
-                console.warn("⚠️ Telegram WebApp غير متوفر، تأكد من تشغيل الصفحة داخل Telegram.");
+                console.warn("⚠️ Telegram WebApp غير متوفر.");
             }
         });
 
-        // دالة لإضافة النقاط والانتقال إلى صفحة اللعبة
         function addUserPointsAndNavigate() {
-            alert("تمت إضافة النقاط! سيتم توجيهك إلى اللعبة.");
-            window.location.href = "https://newlast-lime.vercel.app/home.html";
+            const tg = Telegram.WebApp;
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                const userRef = db.collection("users").doc(user.id);
+                userRef.get().then(doc => {
+                    if (doc.exists) {
+                        const newPoints = (doc.data().points || 0) + 300;
+                        userRef.update({ points: newPoints }).then(() => {
+                            alert("تمت إضافة 300 نقطة! سيتم توجيهك إلى اللعبة.");
+                            window.location.href = "https://newlast-lime.vercel.app/home.html";
+                        });
+                    }
+                });
+            }
         }
     </script>
+
 </body>
 </html>
